@@ -1,0 +1,50 @@
+SELECT first,
+last,
+birthdate
+FROM public.patients
+
+--Encounters refer to patient visits (encounter.csv)--
+--Note: all of this data is synthetically generated and comes from a project called Synthea. No real patient data was used in this lesson.--
+
+
+--Finding inpatient cases, ICU admission, where discharge occcured in 2023--
+SELECT *
+FROM public.encounters
+WHERE encounterclass='inpatient'
+AND description='ICU Admission' 
+AND stop >='2023-01-01 00:00'
+
+SELECT *
+FROM public.encounters
+WHERE encounterclass in ('outpatient','ambulatory')
+
+--another example--
+SELECT *
+FROM public.encounters
+WHERE encounterclass='outpatient',
+ OR encounterclass='ambulatory'
+
+--most common descriptions for patients in descending order with count for each--
+SELECT description,
+COUNT(*) AS count_of_condition
+FROM public.conditions
+GROUP BY description
+ORDER BY COUNT(*) DESC
+
+
+--conditions when conditions have at least 2000 incidences -having only used with group by aggregations--
+SELECT description,
+COUNT(*) AS count_of_condition
+FROM public.conditions
+GROUP BY description
+HAVING COUNT(*) > 2000
+ORDER BY COUNT(*) DESC
+
+--Count of all patients from their city of residence and there must be at least 100 patients. Citites do not include Boston--
+SELECT city,
+COUNT(*)
+FROM public.patients
+WHERE city !='Boston'
+GROUP BY city
+HAVING COUNT(*) >= 100
+ORDER BY COUNT(*) DESC
